@@ -14,3 +14,4 @@ Need installed Java and Maven
 
 P.S. if random.randint(1, 100) < 50: return {'status': 'ERROR' ...
 Was really funny=)
+Save data positive tests never be green

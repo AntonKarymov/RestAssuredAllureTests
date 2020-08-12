@@ -39,7 +39,6 @@ public class AuthorizeNegativeUsernamePasswordTests extends BaseTest {
     }
 
     @Step("Post to /autorize/ with {0} username: {1}: password: {2}")
-    @Test
     public void incorrectAuthorize(String description, String username, String password) {
         given()
                 .contentType(ContentType.JSON)
