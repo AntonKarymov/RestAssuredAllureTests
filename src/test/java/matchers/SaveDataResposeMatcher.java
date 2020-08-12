@@ -30,13 +30,13 @@ public class SaveDataResposeMatcher extends TypeSafeMatcher<SaveDataResponse> {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            new RuntimeException("Can't find JDBC class");
         }
 
         String workingDir = System.getProperty("user.dir");
         String connStr = String.format("jdbc:sqlite:%s/src/service/%s", workingDir, PROPERTIES.getDbName());
         //todo: not good two sql query in one method
-        //better create separate class for working db
+        //todo: better way create separate class for working with db
         String countByIdSql = String.format("SELECT count(*) AS total FROM uploads WHERE id = %s", id);
         String selectByIdFromUploads = String.format("SELECT * FROM uploads WHERE id = %s", id);
         try (
@@ -57,6 +57,7 @@ public class SaveDataResposeMatcher extends TypeSafeMatcher<SaveDataResponse> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        //todo: fast workaround using softAssertions here
         softAssertions.assertAll();
 
         return true;
