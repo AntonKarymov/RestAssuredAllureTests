@@ -32,11 +32,8 @@ public class RequestHelper {
         return token.getToken();
     }
 
-    public static void deleteAllTokens() {
-
-    }
-
+    //todo: best pratcice delete all created objects after test
     public static void deleteAllUploads() {
-
+        // todo: not implemented yet
     }
 }

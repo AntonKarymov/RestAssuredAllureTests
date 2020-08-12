@@ -15,12 +15,14 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static matchers.SaveDataResposeMatcher.isSaveDataSuccess;
 
-public class SaveDataPositiveTests extends BaseTest{
+public class SaveDataPositiveTests extends BaseTest {
     @Epic(value = "Positive /api/save_data/ endpoint")
     @Feature(value = "Post with correct payload json return saved data id")
     @Test
     public void saveCorrectJsonData() {
-        ValidatableResponse response = saveData(ContentType.JSON, "Correct payload", RequestHelper.getToken());
+        String token = RequestHelper.getToken();
+        ValidatableResponse response = saveData(ContentType.JSON, "Correct payload", token);
+        response.statusCode(200);
         SaveDataResponse okResponse = response.extract().body().as(SaveDataResponse.class);
         assertThat(okResponse, isSaveDataSuccess());
     }
@@ -29,14 +31,16 @@ public class SaveDataPositiveTests extends BaseTest{
     @Feature(value = "Post with correct payload via x-www-form-urlencoded return saved data id")
     @Test
     public void saveCorrectUrlencodedData() {
-        ValidatableResponse response = saveData(ContentType.URLENC, "Correct payload", RequestHelper.getToken());
+        String token = RequestHelper.getToken();
+        ValidatableResponse response = saveData(ContentType.URLENC, "Correct payload", token);
+        response.statusCode(200);
         SaveDataResponse okResponse = response.extract().body().as(SaveDataResponse.class);
         assertThat(okResponse, isSaveDataSuccess());
     }
 
     @Step("Post to /api/save_data/ with ContentType {0}: payload: {1}, token: {2}")
     public ValidatableResponse saveData(ContentType contentType, String payload, String token) {
-         RequestSpecification requestSpecification = new RequestSpecBuilder()
+        RequestSpecification requestSpecification = new RequestSpecBuilder()
                 .addHeader("Authorization", String.format("Bearer %s", token))
                 .setAccept(ContentType.JSON)
                 .build();

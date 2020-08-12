@@ -16,7 +16,7 @@ public class BaseTest {
 
     @After
     public void clean() {
-        RequestHelper.deleteAllTokens();
+        RestAssured.requestSpecification = null;
         RequestHelper.deleteAllUploads();
     }
 }
