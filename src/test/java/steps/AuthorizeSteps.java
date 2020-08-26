@@ -27,7 +27,7 @@ public class AuthorizeSteps {
                 .then();
     }
 
-    @Step("Post to /authorize/ with username and password")
+    @Step("Post to /authorize/ with username {username} and password {password}")
     public ValidatableResponse postToAuthorize(String username, String password) {
         HashMap<String, String> usernamePassword = new HashMap<>();
         usernamePassword.put(USERNAME, username);

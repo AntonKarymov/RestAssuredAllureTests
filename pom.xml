@@ -86,6 +86,12 @@
             <version>1.1.1</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.qameta.allure/allure-rest-assured -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-rest-assured</artifactId>
+            <version>2.12.1</version>
+        </dependency>
     </dependencies>
     <build>
         <defaultGoal>dependency:copy-dependencies</defaultGoal>
