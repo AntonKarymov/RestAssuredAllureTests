@@ -5,14 +5,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import utils.SqliteRequestExecutor;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
-
-import static utils.Properties.PROPERTIES;
 
 public class SaveDataResposeMatcher extends TypeSafeMatcher<SaveDataResponse> {
 
@@ -27,36 +23,29 @@ public class SaveDataResposeMatcher extends TypeSafeMatcher<SaveDataResponse> {
         softAssertions.assertThat(saveDataResponse.getStatus().toString()).isEqualTo("OK");
         String id = saveDataResponse.getId();
 
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            new RuntimeException("Can't find JDBC class");
-        }
+        SqliteRequestExecutor sqliteRequestExecutor = new SqliteRequestExecutor();
 
-        String workingDir = System.getProperty("user.dir");
-        String connStr = String.format("jdbc:sqlite:%s/src/service/%s", workingDir, PROPERTIES.getDbName());
-        //todo: not good two sql query in one method
-        //todo: better way create separate class for working with db
         String countByIdSql = String.format("SELECT count(*) AS total FROM uploads WHERE id = %s", id);
-        String selectByIdFromUploads = String.format("SELECT * FROM uploads WHERE id = %s", id);
-        try (
-                Connection con = DriverManager.getConnection(connStr);
-                PreparedStatement psForCountByIdSql = con.prepareStatement(countByIdSql);
-                PreparedStatement psForSelectByIdFromUploads = con.prepareStatement(selectByIdFromUploads)) {
-            try (ResultSet rs = psForCountByIdSql.executeQuery()) {
-                while (rs.next()) {
-                    softAssertions.assertThat(rs.getInt("total")).isEqualTo(1);
-                }
-            }
-            try (ResultSet rs = psForSelectByIdFromUploads.executeQuery()) {
-                while (rs.next()) {
-                    softAssertions.assertThat(rs.getString("user_id")).isEqualTo("supertest");
-                    softAssertions.assertThat(isValidMD5(rs.getString("payload_md5")));
-                }
+        ResultSet countByIdSqlRs = sqliteRequestExecutor.executeQuery(countByIdSql);
+        try{
+            while (countByIdSqlRs.next()) {
+                softAssertions.assertThat(countByIdSqlRs.getInt("total")).isEqualTo(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        String selectByIdFromUploads = String.format("SELECT * FROM uploads WHERE id = %s", id);
+        ResultSet rs = sqliteRequestExecutor.executeQuery(selectByIdFromUploads);
+        try{
+            while (rs.next()) {
+                softAssertions.assertThat(rs.getString("user_id")).isEqualTo("supertest");
+                softAssertions.assertThat(isValidMD5(rs.getString("payload_md5")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         //todo: fast workaround using softAssertions here
         softAssertions.assertAll();
 
