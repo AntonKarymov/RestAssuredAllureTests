@@ -1,41 +1,39 @@
 import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
+import io.qameta.allure.Description;
 import io.restassured.http.ContentType;
 
 import io.restassured.response.ValidatableResponse;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import utils.RequestHelper;
+import steps.AuthorizeSteps;
+import steps.SaveDataSteps;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-@RunWith(value = Parameterized.class)
+@RunWith(value = JUnitParamsRunner.class)
 public class SaveDataNegativePayload extends BaseTest {
-    @Parameterized.Parameter(value = 0)
-    public String payload;
-    @Parameterized.Parameter(value = 1)
-    public String payloadDescr;
-    @Parameterized.Parameter(value = 2)
-    public ContentType contentType;
+    SaveDataSteps saveDataSteps = new SaveDataSteps();
+    AuthorizeSteps authorizeSteps = new AuthorizeSteps();
 
-    @Parameterized.Parameters(name = "Post to /api/save_data/ with {1}: {0} and content type: {2}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                //todo: clarify requirements for payload
-                //ContentType.URLENC
-                {"", "empty payload", ContentType.URLENC},
-                //ContentType.JSON
-                {"", "empty payload", ContentType.JSON},
-        });
+    @Epic(value = "Negative /api/save_data/ with ContentType.URLENC")
+    @Description(value = "Save data with incorrect payload 400 expected")
+    @Test()
+    @Parameters({"",
+            //todo any incorrect payload except empty?
+    })
+    public void saveDataWithIncorrectPayloadJson(String payload) {
+        ValidatableResponse response = saveDataSteps.postToSaveData(ContentType.JSON, payload, authorizeSteps.getToken());
+        response.statusCode(400);
     }
 
-    @Epic(value = "Negative /api/save_data/ endpoint")
-    @Feature(value = "Save data with incorrect payload 400 expected")
+    @Epic(value = "Negative /api/save_data/ endpoint with ContentType.URLENC")
+    @Description(value = "Save data with incorrect payload 400 expected")
     @Test()
-    public void saveDataWithIncorrectPayload() {
-        ValidatableResponse response = new SaveDataPositiveTests().saveData(contentType, payload, RequestHelper.getToken());
+    @Parameters({"",
+            //todo any incorrect payload except empty?
+    })
+    public void saveDataWithIncorrectPayloadUrlenc(String payload) {
+        ValidatableResponse response = saveDataSteps.postToSaveData(ContentType.URLENC, payload, authorizeSteps.getToken());
         response.statusCode(400);
     }
 }

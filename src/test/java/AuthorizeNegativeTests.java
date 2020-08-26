@@ -1,63 +1,50 @@
 import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Step;
+import io.qameta.allure.Description;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Test;
-import utils.EndPoints;
-import utils.RequestHelper;
+import steps.AuthorizeSteps;
+import steps.CommonSteps;
+import steps.SaveDataSteps;
 
-import static io.restassured.RestAssured.given;
+import java.util.HashMap;
 
 public class AuthorizeNegativeTests extends BaseTest {
+    SaveDataSteps saveDataSteps = new SaveDataSteps();
+    AuthorizeSteps authorizeSteps = new AuthorizeSteps();
+    CommonSteps commonSteps = new CommonSteps();
+
     @Epic(value = "Negative token checks")
-    @Feature(value = "Check that token inspire after 60 sec")
+    @Description(value = "Check that token expired after 60 sec")
     @Test()
-    public void checkTokenInspiration() {
-        String token = RequestHelper.getToken();
+    public void checkTokenExpiration() {
+        String token = authorizeSteps.getToken();
         String correctPayload = "Correct payload";
-        ValidatableResponse successSave = new SaveDataPositiveTests().saveData(ContentType.JSON, correctPayload, token);
+        ValidatableResponse successSave = saveDataSteps.postToSaveData(ContentType.JSON, correctPayload, token);
         successSave.statusCode(200);
-        sleep(60);
-        ValidatableResponse unsuccessfulSave = new SaveDataPositiveTests().saveData(ContentType.JSON, correctPayload, token);
+        commonSteps.waitInSecond(60);
+        ValidatableResponse unsuccessfulSave = saveDataSteps.postToSaveData(ContentType.JSON, correctPayload, token);
         unsuccessfulSave.statusCode(403);
     }
 
-    @Step("Thread sleep {0} seconds")
-    public void sleep(long inSecond) {
-        try {
-            Thread.sleep(inSecond * 1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Epic(value = "Negative /autorize/ endpoint")
-    @Feature(value = "Post without username 403 expected")
-    @Step("Sent Post without username")
+    @Epic(value = "Negative /authorize/ endpoint")
+    @Description(value = "Post without username 403 expected")
     @Test
     public void withoutUsername() {
-        given()
-                .contentType(ContentType.JSON)
-                .formParam("password", "superpassword")
-                .when()
-                .post(EndPoints.AUTHORIZE)
-                .then()
+        HashMap<String, String> withoutUsername = new HashMap<>();
+        withoutUsername.put("password", "superpassword");
+        authorizeSteps.postToAuthorize(withoutUsername)
                 .assertThat()
                 .statusCode(403);
     }
 
-    @Epic(value = "Negative /autorize/ endpoint")
-    @Feature(value = "Post without password 403 expected")
-    @Step("Sent Post without password")
+    @Epic(value = "Negative /authorize/ endpoint")
+    @Description(value = "Post without password 403 expected")
     @Test
     public void withoutPassword() {
-        given()
-                .contentType(ContentType.JSON)
-                .formParam("username", "supertest")
-                .when()
-                .post(EndPoints.AUTHORIZE)
-                .then()
+        HashMap<String, String> withoutPassword = new HashMap<>();
+        withoutPassword.put("username", "supertest");
+        authorizeSteps.postToAuthorize(withoutPassword)
                 .assertThat()
                 .statusCode(403);
     }

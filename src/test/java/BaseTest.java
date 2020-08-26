@@ -2,7 +2,6 @@ import io.restassured.RestAssured;
 import io.restassured.filter.log.LogDetail;
 import org.junit.After;
 import org.junit.BeforeClass;
-import utils.RequestHelper;
 
 import static utils.Properties.PROPERTIES;
 
@@ -17,6 +16,6 @@ public class BaseTest {
     @After
     public void clean() {
         RestAssured.requestSpecification = null;
-        RequestHelper.deleteAllUploads();
+        //deleteAllUploads();
     }
 }
