@@ -7,8 +7,7 @@ import steps.AuthorizeSteps;
 import steps.SaveDataSteps;
 import objects.SaveDataResponse;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static matchers.SaveDataResposeMatcher.isSaveDataSuccess;
+import assertions.SaveDataAssert;
 
 public class SaveDataPositiveTests extends BaseTest {
     SaveDataSteps saveDataSteps = new SaveDataSteps();
@@ -22,7 +21,7 @@ public class SaveDataPositiveTests extends BaseTest {
         ValidatableResponse response = saveDataSteps.postToSaveData(ContentType.JSON, "Correct payload", token);
         response.statusCode(200);
         SaveDataResponse okResponse = response.extract().body().as(SaveDataResponse.class);
-        assertThat(okResponse, isSaveDataSuccess());
+        SaveDataAssert.assertThat(okResponse).isSaveDataSuccess("supertest");
     }
 
     @Epic(value = "Positive /api/save_data/ endpoint")
@@ -33,6 +32,6 @@ public class SaveDataPositiveTests extends BaseTest {
         ValidatableResponse response = saveDataSteps.postToSaveData(ContentType.URLENC, "Correct payload", token);
         response.statusCode(200);
         SaveDataResponse okResponse = response.extract().body().as(SaveDataResponse.class);
-        assertThat(okResponse, isSaveDataSuccess());
+        SaveDataAssert.assertThat(okResponse).isSaveDataSuccess("supertest");
     }
 }
